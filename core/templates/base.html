@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Bootstrap Core CSS -->
+    <link href="{% static 'bootstrap/dist/css/bootstrap.min.css' %}" rel="stylesheet">
+    <!-- Sidebar CSS -->
+    <link href="{% static 'plugins/bower_components/sidebar-nav/dist/sidebar-nav.min.css' %}" rel="stylesheet">
+    <!-- Morris CSS -->
+    <link href="{% static 'plugins/bower_components/morrisjs/morris.css' %}" rel="stylesheet">
+    <!-- Animation CSS -->
+    <link href="{% static 'css/animate.css' %}" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <!-- Color CSS -->
+    <link href="{% static 'css/colors/default.css' %}" id="theme" rel="stylesheet">
+
+    <link href="{% static 'less/icons/font-awesome/fonts/fontawesome-webfont.ttf' %}" id="theme" rel="stylesheet">
+
+    <link href="{% static 'plugins/images/users/default.jpg' %}"  rel="stylesheet">
+    
+    <title>Farmer System | {% block title %}{% endblock title %}</title>
+</head>
+
+<body class="fix-header">
+
+<!-- ===================== Preloader (optional) ===================== -->
+<div class="preloader">
+    <svg class="circular" viewBox="25 25 50 50">
+        <circle class="path" cx="50" cy="50" r="20" fill="none"
+                stroke-width="2" stroke-miterlimit="10"/>
+    </svg>
+</div>
+
+<!-- ===================== Wrapper ===================== -->
+<div id="wrapper">
+
+    <!-- ===================== Top Navbar ===================== -->
+    <nav class="navbar navbar-default navbar-static-top m-b-0">
+        <div class="navbar-header">
+
+
+            <!-- Navbar left -->
+            <ul class="nav navbar-top-links navbar-left">
+                <li>
+                    <a href="javascript:void(0)" class="open-close waves-effect waves-light visible-xs">
+                        <i class="ti-menu"></i>
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Navbar right -->
+            <ul class="nav navbar-top-links navbar-right pull-right">
+                <li class="dropdown">
+                    <a class="dropdown-toggle profile-pic" data-toggle="dropdown" href="#">
+                        <img src="{% static 'plugins/images/users/default.jpg' %}" width="36"
+                             class="img-circle">
+                             <b class="hidden-xs">
+                                {% if farmer_profile %}
+                                    {{ farmer_profile.full_name }}
+                                {% elif supplier_profile %}
+                                    {{ supplier_profile.company_name }}
+                                {% else %}
+                                    {{ request.user.username }}
+                                {% endif %}
+                            </b>                            
+                        <span class="caret"></span>
+                    </a>
+            
+                    <ul class="dropdown-menu dropdown-user animated flipInY">
+
+                        <li>
+                            <div class="dw-user-box">
+                                <div class="u-text">
+                                    <h4>
+                                        {% if farmer_profile %}
+                                            {{ farmer_profile.full_name }}
+                                        {% elif supplier_profile %}
+                                            {{ supplier_profile.company_name }}
+                                        {% else %}
+                                            {{ request.user.username }}
+                                        {% endif %}
+                                    </h4>
+                    
+                                    <p class="text-muted">{{ request.user.email }}</p>
+                    
+                                    {% if farmer_profile %}
+                                        <p class="text-muted">{{ farmer_profile.location }}</p>
+                                    {% elif supplier_profile %}
+                                        <p class="text-muted">{{ supplier_profile.location }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </li>
+                    
+                        <li role="separator" class="divider"></li>
+                    
+                        {% if is_farmer %}
+                            <li>
+                                <a href="{% url 'farmer_profile' %}" class="waves-effect">
+                                    <i class="ti-user"></i>
+                                    <span class="hide-menu">My Profile</span>
+                                </a>
+                            </li>
+                            {% endif %}
+
+                        {% if is_supplier %}
+                        <li>
+                            <a href="{% url 'supplier_profile' %}" class="waves-effect">
+                                <i class="ti-user"></i>
+                                <span class="hide-menu">My Profile</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        <li role="separator" class="divider"></li>
+                    
+                        <li>
+                            <a href="{% url 'logout' %}">
+                                <i class="fa fa-power-off"></i> Logout
+                            </a>
+                        </li>
+                    </ul>                    
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <!-- ===================== End Top Navbar ===================== -->
+
+    <!-- ===================== Left Sidebar ===================== -->
+    <div class="navbar-default sidebar" role="navigation">
+        <div class="sidebar-nav slimscrollsidebar">
+            <ul class="nav" id="side-menu">
+
+                {% if is_farmer %}
+                <li>
+                    <a href="{% url 'farmer_dashboard' %}" class="waves-effect">
+                        <i class="mdi mdi-av-timer fa-fw"></i>
+                        <span class="hide-menu">Farmer Dashboard</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if is_supplier %}
+                <li>
+                    <a href="{% url 'supplier_dashboard' %}" class="waves-effect">
+                        <i class="mdi mdi-cart fa-fw"></i>
+                        <span class="hide-menu">Supplier Dashboard</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if is_fieldofficer %}
+                <li>
+                    <a href="{% url 'fieldofficer_dashboard' %}" class="waves-effect">
+                        <i class="mdi mdi-account-supervisor fa-fw"></i>
+                        <span class="hide-menu">Field Officer Dashboard</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                <li class="devider"></li>
+
+                <li>
+                    <a href="{% url 'logout' %}" class="waves-effect">
+                        <i class="mdi mdi-logout fa-fw"></i>
+                        <span class="hide-menu">Logout</span>
+                    </a>
+                </li>
+
+                {% if is_farmer %}
+                <li>
+                    <a href="{% url 'farmer_profile' %}">
+                        <i class="ti-user"></i>
+                        <span class="hide-menu">My Profile</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if is_supplier %}
+                <li>
+                    <a href="{% url 'supplier_profile' %}">
+                        <i class="ti-user"></i>
+                        <span class="hide-menu">My Profile</span>
+                    </a>
+                </li>
+                {% endif %}
+
+
+            </ul>
+        </div>
+    </div>
+    <!-- ===================== End Left Sidebar ===================== -->
+
+    <!-- ===================== Page Content ===================== -->
+    <div id="page-wrapper">
+        <div class="container-fluid">
+            {% block content %}{% endblock content %}
+        </div>
+    </div>
+    <!-- ===================== End Page Content ===================== -->
+
+</div>
+<!-- ===================== End Wrapper ===================== -->
+
+<!-- ===================== Scripts ===================== -->
+<script src="{% static 'plugins/bower_components/jquery/dist/jquery.min.js' %}"></script>
+<script src="{% static 'bootstrap/dist/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'plugins/bower_components/sidebar-nav/dist/sidebar-nav.min.js' %}"></script>
+<script src="{% static 'js/jquery.slimscroll.js' %}"></script>
+<script src="{% static 'js/waves.js' %}"></script>
+<script src="{% static 'plugins/bower_components/skycons/skycons.js' %}"></script>
+<script src="{% static 'plugins/bower_components/waypoints/lib/jquery.waypoints.js' %}"></script>
+<script src="{% static 'plugins/bower_components/counterup/jquery.counterup.min.js' %}"></script>
+<script src="{% static 'plugins/bower_components/raphael/raphael-min.js' %}"></script>
+<script src="{% static 'plugins/bower_components/morrisjs/morris.js' %}"></script>
+<script src="{% static 'js/custom.min.js' %}"></script>
+<script src="{% static 'js/dashboard4.js' %}"></script>
+<script src="{% static 'plugins/bower_components/jquery-sparkline/jquery.sparkline.min.js' %}"></script>
+<script src="{% static 'plugins/bower_components/jquery-sparkline/jquery.charts-sparkline.js' %}"></script>
+<script src="{% static 'plugins/bower_components/styleswitcher/jQuery.style.switcher.js' %}"></script>
+
+</body>
+</html>

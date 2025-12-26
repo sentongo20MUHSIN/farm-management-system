@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Field Officer Dashboard{% endblock %}
+{% block content %}
+
+<hr>
+<div class="row">
+    <div class="col-md-3">
+        <div class="white-box">
+            <h3>Farmers</h3>
+            <h2>{{ total_farmers }}</h2>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="white-box">
+            <h3>Suppliers</h3>
+            <h2>{{ total_suppliers }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="white-box">
+            <h3>Products</h3>
+            <h2>{{ total_products }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="white-box">
+            <h3>My Orders</h3>
+            <h2>{{ total_orders }}</h2>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- Button to trigger report modal -->
+<button class="btn btn-info" data-toggle="modal" data-target="#reportModal">
+    Preview Farm Management Report
+</button>
+
+<a href="{% url 'export_report' %}" class="btn btn-success">
+    Download System Report (PDF)
+</a>
+
+<!-- ===================== Farm Management Report Modal ===================== -->
+<div class="modal fade" id="reportModal" tabindex="-1" role="dialog" aria-labelledby="reportModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="reportModalLabel">Farm Management Report</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" style="max-height:70vh; overflow-y:auto;">
+        
+        <h3>Farmers</h3>
+        <ul>
+            {% for f in farmers %}
+            <li>{{ f.full_name }} - {{ f.phone }} - {{ f.location }}</li>
+            {% empty %}
+            <li>No farmers found.</li>
+            {% endfor %}
+        </ul>
+
+        <h3>Suppliers</h3>
+        <ul>
+            {% for s in suppliers %}
+            <li>{{ s.company_name }} - {{ s.phone }} - {{ s.location }}</li>
+            {% empty %}
+            <li>No suppliers found.</li>
+            {% endfor %}
+        </ul>
+
+        <h3>Products</h3>
+        <ul>
+            {% for p in products %}
+            <li>{{ p.name }} (Stock: {{ p.stock }}) - Supplier: {{ p.supplier.company_name }}</li>
+            {% empty %}
+            <li>No products found.</li>
+            {% endfor %}
+        </ul>
+
+        <h3>Orders</h3>
+        <ul>
+            {% for o in orders %}
+            <li>{{ o.product }} → {{ o.farmer.user.username }} - Supplier: {{ o.supplier.company_name }} ({{ o.status }})</li>
+            {% empty %}
+            <li>No orders found.</li>
+            {% endfor %}
+        </ul>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <a href="{% url 'export_report' %}" class="btn btn-success">Download PDF</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

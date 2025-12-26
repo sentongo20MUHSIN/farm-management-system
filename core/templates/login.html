@@ -1,0 +1,91 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | {% block title %}{% endblock title %}</title>
+    <!-- Bootstrap CSS -->
+    <link href="{% static 'bootstrap/dist/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <link href="{% static 'plugins/images/login-regster.jpg' %}" rel="stylesheet">
+</head>
+<body class="fix-header">
+
+    <!-- Preloader -->
+    <div class="preloader" id="preloader">
+        <div class="cssload-speeding-wheel"></div>
+    </div>
+
+    <!-- Login Section -->
+    <section id="wrapper" class="login-register">
+        <div class="login-box d-flex justify-content-center align-items-center" style="min-height:100vh;">
+
+            <!-- Form Box -->
+            <div class="white-box" style="flex:1; max-width:400px; padding:40px;">
+
+                <!-- Logo -->
+                <div class="text-center mb-4">
+                    <h2>Welcome To Farmer System</h2>
+                    <small>Enter your credentials to access your account</small>
+                </div>
+<!-- Display messages -->
+                
+                <!-- Login Form -->
+    <form class="form-horizontal"
+      id="loginform"
+      method="POST"
+      action="{% url 'login' %}"
+      novalidate>
+
+                    {% csrf_token %}
+
+                    <!-- Username -->
+                    <div class="form-group mb-3">
+                        <input type="text" name="username" value="{{ request.POST.username }}" 
+                               class="form-control" placeholder="Username" required>
+                        {% for error in form.username.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Password -->
+                    <div class="form-group mb-3">
+                        <input type="password" name="password" class="form-control" placeholder="Password" required>
+                        {% for error in form.password.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="form-group text-center mb-3">
+                        <button class="btn btn-info btn-lg btn-block text-uppercase waves-effect waves-light" type="submit">
+                            Log In
+                        </button>
+                    </div>
+
+                    <!-- Register Link -->
+                    <div class="form-group text-center">
+                        <p>Don't have an account?
+                            <a href="{% url 'register' %}" class="text-primary"><b>Sign Up</b></a>
+                        </p>
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="{% static 'plugins/bower_components/jquery/dist/jquery.min.js' %}"></script>
+    <script src="{% static 'bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>
+    <script>
+        // Hide preloader when page loads
+        $(window).on('load', function() {
+            $('#preloader').fadeOut('slow');
+        });
+    </script>
+</body>
+</html>

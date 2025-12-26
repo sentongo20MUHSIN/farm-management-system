@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Supplier Orders{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="white-box">
+            <h3 class="box-title">Orders from Farmers</h3>
+
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Product</th>
+                        <th>Farmer</th>
+                        <th>Quantity</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>{{ order.id }}</td>
+                        <td>{{ order.product.name }}</td>
+                        <td>{{ order.farmer.user.username }}</td>
+                        <td>{{ order.quantity }}</td>
+                        <td>{{ order.status }}</td>
+                        <td>{{ order.created_at|date:"Y-m-d" }}</td>
+                        <td>
+                            {% if order.status != 'delivered' %}
+                                <a href="{% url 'update_order_status' order.id 'approved' %}" class="btn btn-sm btn-info">Approve</a>
+                                <a href="{% url 'update_order_status' order.id 'delivered' %}" class="btn btn-sm btn-success">Mark Delivered</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center">No orders yet</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

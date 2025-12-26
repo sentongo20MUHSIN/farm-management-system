@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Farmer Dashboard{% endblock %}
+
+{% block content %}
+<div id="page-wrapper">
+    <div class="container-fluid">
+
+        <!-- Page title -->
+        <div class="row bg-title">
+            <div class="col-lg-12">
+                <h4 class="page-title">Farmer Dashboard</h4>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="row">
+            <div class="col-md-3">
+                <div class="white-box">
+                    <h3>Total Products</h3>
+                    <h2>{{ total_products }}</h2>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="white-box">
+                    <h3>My Orders</h3>
+                    <h2>{{ total_orders }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <!-- Products Table -->
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="white-box">
+                    <h3 class="box-title">Available Products</h3>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Supplier</th>
+                                <th>Price</th>
+                                <th>Stock</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for product in products %}
+                            <tr>
+                                <td>{{ product.name }}</td>
+                                <td>{{ product.supplier.user.username }}</td>
+                                <td>{{ product.price }}</td>
+                                <td>{{ product.stock }}</td>
+                                <td>
+                                    <button class="btn btn-primary"
+                                            data-toggle="modal"
+                                            data-target="#orderModal{{ product.id }}">
+                                        Order
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <!-- Order Modal -->
+                            <div class="modal fade" id="orderModal{{ product.id }}">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <form method="post">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="product_id" value="{{ product.id }}">
+                                            <div class="modal-header">
+                                                <h4>Order {{ product.name }}</h4>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="form-group">
+                                                    <label>Quantity</label>
+                                                    <input type="number" name="quantity" class="form-control" required>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="submit" class="btn btn-success">Place Order</button>
+                                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- My Orders -->
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="white-box">
+                    <h3 class="box-title">My Orders</h3>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Supplier</th>
+                                <th>Quantity</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for order in orders %}
+                            <tr>
+                                <td>{{ order.product.name }}</td>
+                                <td>{{ order.supplier.user.username }}</td>
+                                <td>{{ order.quantity }}</td>
+                                <td>
+                                    <span class="label
+                                        {% if order.status == 'pending' %}label-warning
+                                        {% elif order.status == 'approved' %}label-info
+                                        {% else %}label-success{% endif %}">
+                                        {{ order.status }}
+                                    </span>
+                                </td>
+                                <td>{{ order.created_at|date:"Y-m-d" }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center">No orders yet</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <footer class="footer text-center">
+        © {{ now|date:"Y" }} Farmer System
+    </footer>
+</div>
+{% endblock %}
