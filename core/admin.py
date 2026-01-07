@@ -9,6 +9,7 @@ from .models import FarmerProfile, SupplierProfile, Product, Order
 class FarmerProfileAdmin(admin.ModelAdmin):
     list_display = (
         'user',
+        'photo',
         'full_name',
         'phone',
         'location',

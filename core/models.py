@@ -4,11 +4,15 @@ from django.contrib.auth.models import User
 
 class FarmerProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    photo = models.ImageField(
+        upload_to='farmers/',
+        null=True,
+        blank=True
+    )
     full_name = models.CharField(max_length=100)
     phone = models.CharField(max_length=20)
     location = models.CharField(max_length=100)
     farm_size = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    crops = models.CharField(max_length=200)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -17,6 +21,11 @@ class FarmerProfile(models.Model):
 
 class SupplierProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    photo = models.ImageField(
+        upload_to='farmers/',
+        null=True,
+        blank=True
+    )
     company_name = models.CharField(max_length=100)
     phone = models.CharField(max_length=20)
     location = models.CharField(max_length=100)

@@ -39,19 +39,13 @@ class UserRegisterForm(forms.ModelForm):
 class FarmerProfileForm(forms.ModelForm):
     class Meta:
         model = FarmerProfile
-        fields = ['full_name', 'phone', 'location', 'farm_size', 'crops']
-        widgets = {
-            'full_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'phone': forms.TextInput(attrs={'class': 'form-control'}),
-            'location': forms.TextInput(attrs={'class': 'form-control'}),
-            'farm_size': forms.NumberInput(attrs={'class': 'form-control'}),
-            'crops': forms.TextInput(attrs={'class': 'form-control'}),
-        }
+        fields = ['photo','full_name', 'phone', 'location', 'farm_size']
+        
 
 class SupplierProfileForm(forms.ModelForm):
     class Meta:
         model = SupplierProfile
-        fields = ['company_name', 'phone', 'location']
+        fields = ['photo','company_name', 'phone', 'location']
 
 
 class ProductForm(forms.ModelForm):

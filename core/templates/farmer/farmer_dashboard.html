@@ -1,144 +1,361 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% load static %}
-
 {% block title %}Farmer Dashboard{% endblock %}
-
 {% block content %}
-<div id="page-wrapper">
-    <div class="container-fluid">
-
-        <!-- Page title -->
-        <div class="row bg-title">
-            <div class="col-lg-12">
-                <h4 class="page-title">Farmer Dashboard</h4>
-            </div>
-        </div>
-
-        <!-- Stats -->
-        <div class="row">
-            <div class="col-md-3">
-                <div class="white-box">
-                    <h3>Total Products</h3>
-                    <h2>{{ total_products }}</h2>
+<!-- ============================================================== -->
+    <!-- Preloader -->
+    <!-- ============================================================== -->
+    <div class="preloader">
+        <svg class="circular" viewBox="25 25 50 50">
+            <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10" /> 
+        </svg>
+    </div>
+    <!-- ============================================================== -->
+    <!-- Wrapper -->
+    <!-- ============================================================== -->
+    <div id="wrapper">
+        <!-- ============================================================== -->
+        <!-- Topbar header - style you can find in pages.scss -->
+        <!-- ============================================================== -->
+        <nav class="navbar navbar-default navbar-static-top m-b-0">
+            <div class="navbar-header">
+                <div class="top-left-part">
+                    <!-- Logo -->
+                    <a class="logo" href="index.html">
+                        <!-- Logo icon image, you can use font-icon also --><b>
+                        <!--This is dark logo icon--><img src="{% static 'plugins/images/busy.gif' %}" alt="home" class="dark-logo" /><!--This is light logo icon--><img src="../plugins/images/admin-logo-dark.png" alt="home" class="light-logo" />
+                     </b>
+                        <!-- Logo text image you can use text also --><span class="hidden-xs">
+                        <!--This is dark logo text--><img src="{% static 'plugins/images/admin-text.png' %}" alt="home" class="dark-logo" /><!--This is light logo text--><img src="../plugins/images/admin-text-dark.png" alt="home" class="light-logo" />
+                     </span> </a>
                 </div>
-            </div>
-
-            <div class="col-md-3">
-                <div class="white-box">
-                    <h3>My Orders</h3>
-                    <h2>{{ total_orders }}</h2>
-                </div>
-            </div>
-        </div>
-
-        <!-- Products Table -->
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="white-box">
-                    <h3 class="box-title">Available Products</h3>
-                    <table class="table table-bordered table-hover">
-                        <thead>
-                            <tr>
-                                <th>Product</th>
-                                <th>Supplier</th>
-                                <th>Price</th>
-                                <th>Stock</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {% for product in products %}
-                            <tr>
-                                <td>{{ product.name }}</td>
-                                <td>{{ product.supplier.user.username }}</td>
-                                <td>{{ product.price }}</td>
-                                <td>{{ product.stock }}</td>
-                                <td>
-                                    <button class="btn btn-primary"
-                                            data-toggle="modal"
-                                            data-target="#orderModal{{ product.id }}">
-                                        Order
-                                    </button>
-                                </td>
-                            </tr>
-
-                            <!-- Order Modal -->
-                            <div class="modal fade" id="orderModal{{ product.id }}">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <form method="post">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="product_id" value="{{ product.id }}">
-                                            <div class="modal-header">
-                                                <h4>Order {{ product.name }}</h4>
-                                            </div>
-                                            <div class="modal-body">
-                                                <div class="form-group">
-                                                    <label>Quantity</label>
-                                                    <input type="number" name="quantity" class="form-control" required>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="submit" class="btn btn-success">Place Order</button>
-                                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                                            </div>
-                                        </form>
+                <!-- /Logo -->
+                <!-- Search input and Toggle icon -->
+                
+                <ul class="nav navbar-top-links navbar-right pull-right">
+                    <li>
+                        <form role="search" class="app-search hidden-sm hidden-xs m-r-10">
+                            <input type="text" placeholder="Search..." class="form-control"> <a href=""><i class="fa fa-search"></i></a> </form>
+                    </li>
+                    <li class="dropdown">
+                        <a class="dropdown-toggle profile-pic" data-toggle="dropdown" href="#">
+                            <img src="{% if farmer_profile.photo %}{{ farmer_profile.photo.url }}{% else %}{% static 'snacks/imgs/customer01.jpg' %}{% endif %}" 
+                                 alt="user-img" width="36" class="img-circle">
+                            <b class="hidden-xs">{{ farmer_profile.full_name }}</b>
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-user animated flipInY">
+                            <li>
+                                <div class="dw-user-box text-center">
+                                    <div class="u-img mb-2">
+                                        <img src="{% if farmer_profile.photo %}{{ farmer_profile.photo.url }}{% else %}{% static 'snacks/imgs/customer01.jpg' %}{% endif %}" 
+                                             alt="user" class="rounded-circle" width="120">
+                                    </div>
+                                    <div class="u-text">
+                                        <h4>{{ farmer_profile.full_name }}</h4>
+                                        <p class="text-muted">{{ farmer_profile.phone }}</p>
+                                        <p class="text-muted">{{ farmer_profile.location }}</p>
+                                        <p class="text-muted">Farm Size: {{ farmer_profile.farm_size }}</p>
+                                        <a href="#" data-toggle="modal" data-target="#profileModal" class="btn btn-rounded btn-danger btn-sm">View Profile</a>
                                     </div>
                                 </div>
+                            </li>
+                            <li role="separator" class="divider"></li>
+                            <li>
+                                <a href="#" data-toggle="modal" data-target="#profileModal">
+                                    <i class="ti-user"></i> My Profile
+                                </a>
+                            </li>
+                            
+                            <li><a href="#"><i class="ti-wallet"></i> My Balance</a></li>
+                            <li><a href="#"><i class="ti-email"></i> Inbox</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="#"><i class="ti-settings"></i> Account Setting</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="{% url 'logout' %}"><i class="fa fa-power-off"></i> Logout</a></li>
+                        </ul>
+                        <!-- /.dropdown-user -->
+                    </li>
+                    
+                    <!-- /.dropdown -->
+                </ul>
+            </div>
+            
+            <!-- /.navbar-header -->
+            <!-- /.navbar-top-links -->
+            <!-- /.navbar-static-side -->
+        </nav>
+        <!-- ================= PROFILE MODAL ================= -->
+        <div class="modal fade" id="profileModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+                <div class="modal-content">
+                    <form method="POST" action="{% url 'farmer_profile' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <div class="modal-header">
+                            <h5 class="modal-title">My Profile</h5>
+                            <button type="button" class="close" data-dismiss="modal">
+                                <span>&times;</span>
+                            </button>
+                        </div>
+
+                        <div class="modal-body">
+                            <div class="text-center mb-3">
+                                <img src="{% if farmer_profile.photo %}{{ farmer_profile.photo.url }}{% else %}{% static 'snacks/imgs/customer01.jpg' %}{% endif %}"
+                                    class="rounded-circle mb-2" width="120">
+                                <input type="file" name="photo" class="form-control mt-2">
                             </div>
-                        {% endfor %}
-                        </tbody>
-                    </table>
+
+                            <div class="mb-3">
+                                <label>Full Name</label>
+                                <input type="text" name="full_name" class="form-control"
+                                    value="{{ farmer_profile.full_name }}">
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Phone</label>
+                                <input type="text" name="phone" class="form-control"
+                                    value="{{ farmer_profile.phone }}">
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Location</label>
+                                <input type="text" name="location" class="form-control"
+                                    value="{{ farmer_profile.location }}">
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Farm Size</label>
+                                <input type="text" name="farm_size" class="form-control"
+                                    value="{{ farmer_profile.farm_size }}">
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-success">Save Changes</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
 
-        <!-- My Orders -->
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="white-box">
-                    <h3 class="box-title">My Orders</h3>
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Product</th>
-                                <th>Supplier</th>
-                                <th>Quantity</th>
-                                <th>Status</th>
-                                <th>Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {% for order in orders %}
-                            <tr>
-                                <td>{{ order.product.name }}</td>
-                                <td>{{ order.supplier.user.username }}</td>
-                                <td>{{ order.quantity }}</td>
-                                <td>
-                                    <span class="label
-                                        {% if order.status == 'pending' %}label-warning
-                                        {% elif order.status == 'approved' %}label-info
-                                        {% else %}label-success{% endif %}">
-                                        {{ order.status }}
-                                    </span>
-                                </td>
-                                <td>{{ order.created_at|date:"Y-m-d" }}</td>
-                            </tr>
-                        {% empty %}
-                            <tr>
-                                <td colspan="5" class="text-center">No orders yet</td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+
+        <!-- End Top Navigation -->
+        <!-- ============================================================== -->
+        <!-- Left Sidebar - style you can find in sidebar.scss  -->
+        <!-- ============================================================== -->
+        <div class="navbar-default sidebar" role="navigation">
+            <div class="sidebar-nav slimscrollsidebar">
+                <div class="sidebar-head">
+                    <h3><span class="fa-fw open-close"><i class="ti-close ti-menu"></i></span> <span class="hide-menu">Menu</span></h3> </div>
+                    <ul class="nav" id="side-menu">
+                    
+                    <li><a href="{% url 'farmer_dashboard' %}" class="waves-effect"><i class="mdi mdi-av-timer fa-fw" data-icon="v"></i> <span class="hide-menu"> Farmer Dashboard <span class="fa arrow"></span> </span></a>
+                    <a href="#" class="waves-effect"><i class="mdi mdi-format-color-fill fa-fw"></i> <span class="hide-menu">Supplier<span class="fa arrow"></span> <span class="label label-rouded label-info pull-right"></span> </span></a>
+                    <a href="#" class="waves-effect"><i class="mdi mdi-content-copy fa-fw"></i> <span class="hide-menu">Orders<span class="fa arrow"></span><span class="label label-rouded label-warning pull-right"></span></span></a>
+                    <a href="#" class="waves-effect"><i class="mdi mdi-format-color-fill fa-fw"></i> <span class="hide-menu">Export Reports<span class="fa arrow"></span> <span class="label label-rouded label-info pull-right"></span> </span></a>
+                    <a href="{% url 'logout' %}" class="waves-effect"><i class="mdi mdi-content-copy fa-fw"></i> <span class="hide-menu">Logout<span class="fa arrow"></span><span class="label label-rouded label-warning pull-right"></span></span></a>
+                    </li>
+                    <li class="devider"></li>
+                    
+                </ul>
             </div>
         </div>
+        <!-- ============================================================== -->
+        <!-- End Left Sidebar -->
+        <!-- ============================================================== -->
+        <!-- ============================================================== -->
+        <!-- Page Content -->
+        <!-- ============================================================== -->
+        <div id="page-wrapper">
+            <div class="container-fluid">
+                <div class="row bg-title">
+                    <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
+                        <h4 class="page-title">Farmer DashBoard</h4> </div>
+                    <div class="col-lg-9 col-sm-8 col-md-8 col-xs-12"> <button class="right-side-toggle waves-effect waves-light btn-info btn-circle pull-right m-l-20"><i class="ti-settings text-white"></i></button>
+                        
+                        <a href="#" target="_blank" class="btn btn-danger pull-right m-l-20 hidden-xs hidden-sm waves-effect waves-light"
+                        data-toggle="modal" data-target="#orderModal{{ product.id }}"
+                        >Make Order</a>
+                        <ol class="breadcrumb">
+                            <li><a href="#">Dashboard</a></li>
+                            <li class="active">Farmer Dashboard</li>
+                        </ol>
+                    </div>
+                    <!-- /.col-lg-12 -->
+                </div>
+                <!-- /.row -->
+                <!-- ============================================================== -->
+                <!-- Different data widgets -->
+                <!-- ============================================================== -->
+                 <!-- .row -->
+                <div class="row">
+                    <div class="col-lg-6 col-sm-6 col-xs-12">
+                        <div class="white-box analytics-info">
+                            <h3 class="box-title">Total Products </h3>
+                            <ul class="list-inline two-part">
+                                <li>
+                                    <div id="sparklinedash2"></div>
+                                </li>
+                                <li class="text-right"><i class="ti-arrow-up text-purple"></i> <span class="counter text-purple">{{ total_products }}</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-sm-6 col-xs-12">
+                        <div class="white-box analytics-info">
+                            <h3 class="box-title">Total Orders</h3>
+                            <ul class="list-inline two-part">
+                                <li>
+                                    <div id="sparklinedash4"></div>
+                                </li>
+                                <li class="text-right"><i class="ti-arrow-down text-danger"></i> <span class="text-danger">{{ total_orders }}</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!--/.row -->
 
-    </div>
-
-    <footer class="footer text-center">
-        © {{ now|date:"Y" }} Farmer System
-    </footer>
+                <!--row -->
+                <!-- /.row -->
+                <div class="row">
+                    <div class="col-md-12 col-lg-6 col-sm-12">
+                        <div class="white-box">
+                            <h3 class="box-title">Recent Orders
+                            </h3>
+                            
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>No:</th>
+                                            <th>Supplier</th>
+                                            <th>Product</th>
+                                            <th>Quantity</th>
+                                            <th>Status</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for order in orders %}
+                                        <tr>
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>{{ order.supplier.company_name }}</td>
+                                            <td>{{ order.product.name }}</td>
+                                            <td>{{ order.quantity }}</td>
+                                            <td>
+                                                <span class="label label-info">
+                                                    {{ order.status }}
+                                                </span>
+                                            </td>
+                                            <td>{{ order.created_at|date:"M d, Y" }}</td>
+                                            </tr>
+                                            {% empty %}
+                                            <tr>
+                                            <td colspan="6" class="text-center">No orders found</td>
+                                            </tr>
+                                            {% endfor %}
+                                    </tbody>
+                                </table> 
+                            </div>
+                        </div>
+                    </div>
+                    <!-- ===== PRODUCTS TABLE ===== -->
+                    <div class="col-md-12 col-lg-6 col-sm-12">
+                        <div class="white-box">
+                            <h3 class="box-title">Available Products
+                            </h3>
+                            
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>No:</th>
+                                            <th>Product</th>
+                                            <th>Supplier</th>
+                                            <th>Price</th>
+                                            <th>Status</th>
+                                            <th>make Order</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for product in products %}
+                                        <tr>
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>{{ product.name }}</td>
+                                            <td>{{ product.supplier.company_name }}</td>
+                                            <td>{{ product.price }}</td>
+                                            <td>
+                                                <span class="label label-info">
+                                                    Available
+                                                </span>                                                
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-danger btn-sm"
+                                                        data-toggle="modal"
+                                                        data-target="#orderModal{{ product.id }}">
+                                                    Make Order
+                                                </button>
+                                            </td>
+                                            
+                                            </tr>
+                                            {% empty %}
+                                            <tr>
+                                                <td colspan="5" class="text-center">No products available</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                </table> 
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                
+                <!-- ============================================================== -->
+                    
+               
+                
+                <!-- ============================================================== -->
+                <!-- end right sidebar -->
+                <!-- ============================================================== -->
 </div>
+    
+{% for product in products %}
+<div class="modal fade" id="orderModal{{ product.id }}">
+    <div class="modal-dialog modal-dialog-centered">
+        <form method="POST" class="modal-content">
+            {% csrf_token %}
+
+            <div class="modal-header">
+                <h5>Order {{ product.name }}</h5>
+                <button class="close" data-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <input type="hidden" name="product_id" value="{{ product.id }}">
+
+                <p><b>Supplier:</b> {{ product.supplier.full_name }}</p>
+                <p><b>Price:</b> UGX {{ product.price }}</p>
+                <p><b>Available:</b> {{ product.stock }}</p>
+
+                <label>Quantity</label>
+                <input type="number"
+                       name="quantity"
+                       min="1"
+                       max="{{ product.stock }}"
+                       class="form-control"
+                       required>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-success">Place Order</button>
+                <button class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endfor %}
+
 {% endblock %}

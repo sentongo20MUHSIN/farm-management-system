@@ -2,102 +2,374 @@
 {% load static %}
 {% block title %}Field Officer Dashboard{% endblock %}
 {% block content %}
-
-<hr>
-<div class="row">
-    <div class="col-md-3">
-        <div class="white-box">
-            <h3>Farmers</h3>
-            <h2>{{ total_farmers }}</h2>
+<!-- ============================================================== -->
+    <!-- Preloader -->
+    <!-- ============================================================== -->
+    <div class="preloader">
+        <svg class="circular" viewBox="25 25 50 50">
+            <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10" /> 
+        </svg>
+    </div>
+    <!-- ============================================================== -->
+    <!-- Wrapper -->
+    <!-- ============================================================== -->
+    <div id="wrapper">
+        <!-- ============================================================== -->
+        <!-- Topbar header - style you can find in pages.scss -->
+        <!-- ============================================================== -->
+        <nav class="navbar navbar-default navbar-static-top m-b-0">
+            <div class="navbar-header">
+                <div class="top-left-part">
+                    <!-- Logo -->
+                    <a class="logo" href="index.html">
+                        <!-- Logo icon image, you can use font-icon also --><b>
+                        <!--This is dark logo icon--><img src="{% static 'plugins/images/busy.gif' %}" alt="home" class="dark-logo" /><!--This is light logo icon--><img src="../plugins/images/admin-logo-dark.png" alt="home" class="light-logo" />
+                     </b>
+                        <!-- Logo text image you can use text also --><span class="hidden-xs">
+                        <!--This is dark logo text--><img src="../plugins/images/admin-text.png" alt="home" class="dark-logo" /><!--This is light logo text--><img src="../plugins/images/admin-text-dark.png" alt="home" class="light-logo" />
+                     </span> </a>
+                </div>
+                <!-- /Logo -->
+                <!-- Search input and Toggle icon -->
+                <ul class="nav navbar-top-links navbar-left">
+                    <li><a href="javascript:void(0)" class="open-close waves-effect waves-light"><i class="ti-menu"></i></a></li>
+                    <li class="dropdown">
+                        <a class="dropdown-toggle waves-effect waves-light" data-toggle="dropdown" href="#"> <i class="mdi mdi-gmail"></i>
+                            <div class="notify"> <span class="heartbit"></span> <span class="point"></span> </div>
+                        </a>
+                        <ul class="dropdown-menu mailbox animated bounceInDown">
+                            <li>
+                                <div class="drop-title">You have one new messages</div>
+                            </li>
+                            <li>
+                                <div class="message-center">
+                                    <a href="#">
+                                        <div class="user-img"> <img src="../plugins/images/users/pawandeep.jpg" alt="user" class="img-circle"> <span class="profile-status online pull-right"></span> </div>
+                                        <div class="mail-contnet">
+                                            <h5>Pavan kumar</h5> <span class="mail-desc">Just see the my admin!</span> <span class="time">9:30 AM</span> </div>
+                                    </a>
+                                    
+                                </div>
+                            </li>
+                        </ul>
+                        <!-- /.dropdown-messages -->
+                    </li>
+                    <!-- .Task dropdown -->
+                    <li class="dropdown">
+                        <a class="dropdown-toggle waves-effect waves-light" data-toggle="dropdown" href="#"> <i class="mdi mdi-check-circle"></i>
+                            <div class="notify"><span class="heartbit"></span><span class="point"></span></div>
+                        </a>
+                        <ul class="dropdown-menu dropdown-tasks animated slideInUp">
+                            <li>
+                                <a href="#">
+                                    
+                                </a>
+                            
+                        </ul>
+                    </li>
+                    <!-- .Megamenu -->
+                    <li class="mega-dropdown"> <a class="dropdown-toggle waves-effect waves-light" data-toggle="dropdown" href="#"><span class="hidden-xs">Mega</span> <i class="icon-options-vertical"></i></a>
+                        <ul class="dropdown-menu mega-dropdown-menu animated bounceInDown">
+                            <li class="col-sm-3">
+                            
+                            
+                        </ul>
+                    </li>
+                    <!-- /.Megamenu -->
+                </ul>
+                <ul class="nav navbar-top-links navbar-right pull-right">
+                    <li>
+                        <form role="search" class="app-search hidden-sm hidden-xs m-r-10">
+                            <input type="text" placeholder="Search..." class="form-control"> <a href=""><i class="fa fa-search"></i></a> </form>
+                    </li>
+                    <li class="dropdown">
+                        <a class="dropdown-toggle profile-pic" data-toggle="dropdown" href="#"> <img src="{% static 'plugins/images/busy.gif' %}" alt="user-img" width="36" class="img-circle"><b class="hidden-xs">Steave</b><span class="caret"></span> </a>
+                        <ul class="dropdown-menu dropdown-user animated flipInY">
+                            <li>
+                                <div class="dw-user-box">
+                                    <div class="u-img"><img src="{% static 'plugins/images/busy.gif' %}" alt="user" /></div>
+                                    <div class="u-text">
+                                        <h4>Steave Jobs</h4>
+                                        <p class="text-muted">varun@gmail.com</p><a href="#" class="btn btn-rounded btn-danger btn-sm">View Profile</a></div>
+                                </div>
+                            </li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="#"><i class="ti-user"></i> My Profile</a></li>
+                            <li><a href="#"><i class="ti-wallet"></i> My Balance</a></li>
+                            <li><a href="#"><i class="ti-email"></i> Inbox</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="#"><i class="ti-settings"></i> Account Setting</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="{% url 'logout' %}"><i class="fa fa-power-off"></i> Logout</a></li>
+                        </ul>
+                        <!-- /.dropdown-user -->
+                    </li>
+                    
+                    <!-- /.dropdown -->
+                </ul>
+            </div>
+            <!-- /.navbar-header -->
+            <!-- /.navbar-top-links -->
+            <!-- /.navbar-static-side -->
+        </nav>
+        <!-- End Top Navigation -->
+        <!-- ============================================================== -->
+        <!-- Left Sidebar - style you can find in sidebar.scss  -->
+        <!-- ============================================================== -->
+        <div class="navbar-default sidebar" role="navigation">
+            <div class="sidebar-nav slimscrollsidebar">
+                <div class="sidebar-head">
+                    <h3><span class="fa-fw open-close"><i class="ti-close ti-menu"></i></span> <span class="hide-menu">Menu</span></h3> </div>
+                    <ul class="nav" id="side-menu">
+                    
+                    <li><a href="{% url 'fieldofficer_dashboard' %}" class="waves-effect"><i class="mdi mdi-av-timer fa-fw" data-icon="v"></i> <span class="hide-menu"> FieldOfficer Dashboard <span class="fa arrow"></span> </span></a>
+                    <a href="#" class="waves-effect"><i class="mdi mdi-format-color-fill fa-fw"></i> <span class="hide-menu">Farmer<span class="fa arrow"></span> <span class="label label-rouded label-info pull-right"></span> </span></a>
+                    <a href="#" class="waves-effect"><i class="mdi mdi-content-copy fa-fw"></i> <span class="hide-menu">Orders<span class="fa arrow"></span><span class="label label-rouded label-warning pull-right"></span></span></a>
+                    <a href="{% url 'export_report' %}" class="waves-effect"><i class="mdi mdi-format-color-fill fa-fw"></i> <span class="hide-menu">Export Reports<span class="fa arrow"></span> <span class="label label-rouded label-info pull-right"></span> </span></a>
+                    <a href="{% url 'logout' %}" class="waves-effect"><i class="mdi mdi-content-copy fa-fw"></i> <span class="hide-menu">Logout<span class="fa arrow"></span><span class="label label-rouded label-warning pull-right"></span></span></a>
+                    </li>
+                    <li class="devider"></li>
+                    
+                </ul>
+            </div>
         </div>
-    </div>
+        <!-- ============================================================== -->
+        <!-- End Left Sidebar -->
+        <!-- ============================================================== -->
+        <!-- ============================================================== -->
+        <!-- Page Content -->
+        <!-- ============================================================== -->
+        <div id="page-wrapper">
+            <div class="container-fluid">
+                <div class="row bg-title">
+                    <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
+                        <h4 class="page-title">FieldOfficer DashBoard</h4> </div>
+                    <div class="col-lg-9 col-sm-8 col-md-8 col-xs-12"> <button class="right-side-toggle waves-effect waves-light btn-info btn-circle pull-right m-l-20"><i class="ti-settings text-white"></i></button>
+                        <a href="{% url 'export_report' %}" target="_blank" class="btn btn-danger pull-right m-l-20 hidden-xs hidden-sm waves-effect waves-light">Download PDF</a>
+                        <ol class="breadcrumb">
+                            <li><a href="#">Dashboard</a></li>
+                            <li class="active">FieldOfficer Dashboard</li>
+                        </ol>
+                    </div>
+                    <!-- /.col-lg-12 -->
+                </div>
+                <!-- /.row -->
+                <!-- ============================================================== -->
+                <!-- Different data widgets -->
+                <!-- ============================================================== -->
+                 <!-- .row -->
+                <div class="row">
+                    <div class="col-lg-3 col-sm-6 col-xs-12">
+                        <div class="white-box analytics-info">
+                            <h3 class="box-title">Total Farmers</h3>
+                            <ul class="list-inline two-part">
+                                <li>
+                                    <div id="sparklinedash"></div>
+                                </li>
+                                <li class="text-right"><i class="ti-arrow-up text-success"></i> <span class="counter text-success">{{total_farmers}}</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-6 col-xs-12">
+                        <div class="white-box analytics-info">
+                            <h3 class="box-title">Total Products </h3>
+                            <ul class="list-inline two-part">
+                                <li>
+                                    <div id="sparklinedash2"></div>
+                                </li>
+                                <li class="text-right"><i class="ti-arrow-up text-purple"></i> <span class="counter text-purple">{{ total_products }}</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-6 col-xs-12">
+                        <div class="white-box analytics-info">
+                            <h3 class="box-title">Total Suppliers</h3>
+                            <ul class="list-inline two-part">
+                                <li>
+                                    <div id="sparklinedash3"></div>
+                                </li>
+                                <li class="text-right"><i class="ti-arrow-up text-info"></i> <span class="counter text-info">{{ total_suppliers }}</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-6 col-xs-12">
+                        <div class="white-box analytics-info">
+                            <h3 class="box-title">Total Orders</h3>
+                            <ul class="list-inline two-part">
+                                <li>
+                                    <div id="sparklinedash4"></div>
+                                </li>
+                                <li class="text-right"><i class="ti-arrow-down text-danger"></i> <span class="text-danger">{{ total_orders }}</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!--/.row -->
 
-    <div class="col-md-3">
-        <div class="white-box">
-            <h3>Suppliers</h3>
-            <h2>{{ total_suppliers }}</h2>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="white-box">
-            <h3>Products</h3>
-            <h2>{{ total_products }}</h2>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="white-box">
-            <h3>My Orders</h3>
-            <h2>{{ total_orders }}</h2>
-        </div>
-    </div>
-</div>
-
-<hr>
-
-<!-- Button to trigger report modal -->
-<button class="btn btn-info" data-toggle="modal" data-target="#reportModal">
-    Preview Farm Management Report
-</button>
-
-<a href="{% url 'export_report' %}" class="btn btn-success">
-    Download System Report (PDF)
-</a>
-
-<!-- ===================== Farm Management Report Modal ===================== -->
-<div class="modal fade" id="reportModal" tabindex="-1" role="dialog" aria-labelledby="reportModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="reportModalLabel">Farm Management Report</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body" style="max-height:70vh; overflow-y:auto;">
-        
-        <h3>Farmers</h3>
-        <ul>
-            {% for f in farmers %}
-            <li>{{ f.full_name }} - {{ f.phone }} - {{ f.location }}</li>
-            {% empty %}
-            <li>No farmers found.</li>
-            {% endfor %}
-        </ul>
-
-        <h3>Suppliers</h3>
-        <ul>
-            {% for s in suppliers %}
-            <li>{{ s.company_name }} - {{ s.phone }} - {{ s.location }}</li>
-            {% empty %}
-            <li>No suppliers found.</li>
-            {% endfor %}
-        </ul>
-
-        <h3>Products</h3>
-        <ul>
-            {% for p in products %}
-            <li>{{ p.name }} (Stock: {{ p.stock }}) - Supplier: {{ p.supplier.company_name }}</li>
-            {% empty %}
-            <li>No products found.</li>
-            {% endfor %}
-        </ul>
-
-        <h3>Orders</h3>
-        <ul>
-            {% for o in orders %}
-            <li>{{ o.product }} → {{ o.farmer.user.username }} - Supplier: {{ o.supplier.company_name }} ({{ o.status }})</li>
-            {% empty %}
-            <li>No orders found.</li>
-            {% endfor %}
-        </ul>
-
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <a href="{% url 'export_report' %}" class="btn btn-success">Download PDF</a>
-      </div>
-    </div>
-  </div>
-</div>
+                <!--row -->
+                <!-- /.row -->
+                <div class="row">
+                    <div class="col-md-12 col-lg-6 col-sm-12">
+                        <div class="white-box">
+                            <h3 class="box-title">Recent Orders
+                            </h3>
+                            
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>No:</th>
+                                            <th>Farmer</th>
+                                            <th>Product</th>
+                                            <th>Quantity</th>
+                                            <th>Status</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for order in orders %}
+                                        <tr>
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>{{ order.farmer.full_name }}</td>
+                                            <td>{{ order.product.name }}</td>
+                                            <td>{{ order.quantity }}</td>
+                                            <td>
+                                                <span class="label label-info">
+                                                    {{ order.status }}
+                                                </span>
+                                            </td>
+                                            <td>{{ order.created_at|date:"M d, Y" }}</td>
+                                            </tr>
+                                            {% empty %}
+                                            <tr>
+                                            <td colspan="6" class="text-center">No orders found</td>
+                                            </tr>
+                                            {% endfor %}
+                                    </tbody>
+                                </table> 
+                            </div>
+                        </div>
+                    </div>
+                    <!-- ===== PRODUCTS TABLE ===== -->
+                    <div class="col-md-12 col-lg-6 col-sm-12">
+                        <div class="white-box">
+                            <h3 class="box-title">Available Products
+                            </h3>
+                            
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>No:</th>
+                                            <th>Product</th>
+                                            <th>Supplier</th>
+                                            <th>Price</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for product in products %}
+                                        <tr>
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>{{ product.name }}</td>
+                                            <td>{{ product.supplier.company_name }}</td>
+                                            <td>{{ product.price }}</td>
+                                                   
+                                            </tr>
+                                            {% empty %}
+                                            <tr>
+                                                <td colspan="5" class="text-center">No products available</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                </table> 
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+                <!-- ============================================================== -->
+                <!-- calendar widgets -->
+                <!-- ============================================================== -->
+                <div class="row">
+                    <div class="col-lg-4 col-md-12 col-sm-12">
+                        <div class="panel">
+                            <div class="p-20">
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                         <h5 class="m-b-0">List Of</h5>
+                                         <h3 class="m-t-0 font-medium">Suppliers</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Company Name</th>
+                                            <th>Phone</th>
+                                            <th>Location</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for s in suppliers %}
+                                            <tr>
+                                                <td>{{ forloop.counter }}</td>
+                                                <td>{{ s.company_name }}</td>
+                                                <td>{{ s.phone }}</td>
+                                                <td>{{ s.location }}</td>
+                                            </tr>   
+                                        {% endfor %}
+                                        </tbody>
+                                </table> 
+                            </div>
+                        </div>          
+                    </div>
+                    <div class="col-md-12 col-lg-8 col-sm-12">
+                         <div class="panel">
+                        <div class="panel-heading">FARMERS</div>
+                        <div class="table-responsive">
+                            <table class="table table-hover manage-u-table">
+                                <thead>
+                                    <tr>
+                                        <th width="70" class="text-center">#</th>
+                                            <th>Farmer Name</th>
+                                            <th>Phone</th>
+                                            <th>Location</th>
+                                            <th>Date Joined</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tbody>
+                                        {% for farmer in farmers %}
+                                        <tr>
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>{{ farmer.full_name }}</td>
+                                            <td>{{ farmer.phone }}</td>
+                                            <td>{{ farmer.location }}</td>
+                                            <td>{{ farmer.created_at|date:"M d, Y" }}</td>
+                                        </tr>
+                                        {% empty %}
+                                        <tr>
+                                            <td colspan="5" class="text-center">No farmers found</td>
+                                        </tr>
+                                        {% endfor %}  
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    </div>
+                 </div>
+                
+                <!-- ============================================================== -->
+                    
+               
+                
+                <!-- ============================================================== -->
+                <!-- end right sidebar -->
+                <!-- ============================================================== -->
+            </div>
+    
 
 {% endblock %}

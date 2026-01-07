@@ -115,9 +115,15 @@ USE_TZ = True
 
 LOGIN_URL = 'login'  # where the user is sent if not logged in
 LOGOUT_REDIRECT_URL = 'login'  # where user is sent after logout
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+

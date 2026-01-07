@@ -1,4 +1,6 @@
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 from .views import register, login_view,supplier_dashboard,farmer_dashboard,no_role,fieldofficer_dashboard,logout_view,farmer_profile,add_product,supplier_profile,edit_product,delete_product,place_order,supplier_orders,export_report_pdf,update_order_status
 
 urlpatterns = [
@@ -23,3 +25,5 @@ urlpatterns = [
 
 
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

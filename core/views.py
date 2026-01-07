@@ -51,15 +51,21 @@ def farmer_profile(request):
     profile, created = FarmerProfile.objects.get_or_create(user=request.user)
 
     if request.method == 'POST':
-        form = FarmerProfileForm(request.POST, instance=profile)
+        form = FarmerProfileForm(
+            request.POST,
+            request.FILES,   # ✅ VERY IMPORTANT
+            instance=profile
+        )
         if form.is_valid():
             form.save()
             messages.success(request, 'Profile updated successfully')
-            return redirect('farmer_profile')
+            return redirect('farmer_dashboard')
+        else:
+            print(form.errors)  # 👈 Debug helper
     else:
         form = FarmerProfileForm(instance=profile)
 
-    return render(request, 'farmer/profile.html', {'form': form})
+    return redirect('farmer_dashboard')
 
 
 class LoginForm(forms.Form):
@@ -102,21 +108,6 @@ def no_role(request):
     messages.error(request, 'No role assigned. Contact admin.')
     return render(request, 'login.html')
 
-@login_required
-def supplier_dashboard(request):
-    if not request.user.groups.filter(name="Supplier").exists():
-        return redirect("login")
-
-    supplier = SupplierProfile.objects.get(user=request.user)
-
-    products = Product.objects.filter(supplier=supplier)
-    orders = Order.objects.filter(supplier=supplier)
-
-    return render(request, "supplier/supplier_dashboard.html", {
-        "products": products,
-        "orders": orders,
-        "supplier_profile": supplier
-    })
 
 @login_required
 def farmer_dashboard(request):
@@ -124,7 +115,7 @@ def farmer_dashboard(request):
     if not request.user.groups.filter(name="Farmer").exists():
         return redirect("login")
 
-    farmer_profile = FarmerProfile.objects.get(user=request.user)
+    farmer_profile, _ = FarmerProfile.objects.get_or_create(user=request.user)
 
     products = Product.objects.all()
 
@@ -190,129 +181,14 @@ def logout_view(request):
     return render(request, 'login.html')
 
 
-@login_required
-def add_product(request):
-    if not request.user.groups.filter(name='Supplier').exists():
-        return redirect('login')
-
-    supplier = SupplierProfile.objects.get(user=request.user)
-
-    if request.method == 'POST':
-        Product.objects.create(
-            supplier=supplier,
-            name=request.POST['name'],
-            price=request.POST['price'],
-            stock=request.POST['stock']
-        )
-        messages.success(request, 'Product added successfully')
-        return redirect('supplier_dashboard')
-
-
-@login_required
-def edit_product(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
-
-    if product.supplier.user != request.user:
-        return redirect("login")
-
-    if request.method == "POST":
-        product.name = request.POST['name']
-        product.price = request.POST['price']
-        product.stock = request.POST['stock']
-        product.save()
-    messages.success(request, 'Product updated successfully')
-    return redirect("supplier_dashboard")
-
-@login_required
-def delete_product(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
-
-    if product.supplier.user != request.user:
-        return redirect("login")
-
-    product.delete()
-    messages.success(request, 'Product deleted successfully')
-    return redirect("supplier_dashboard")
-
-
-@login_required
-def supplier_profile(request):
-    if not request.user.groups.filter(name="Supplier").exists():
-        return redirect("login")
-
-    supplier_profile, _ = SupplierProfile.objects.get_or_create(
-        user=request.user,
-        defaults={'company_name': request.user.username}
-    )
-
-    if request.method == "POST":
-        form = SupplierProfileForm(request.POST, instance=supplier_profile)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Profile updated successfully")
-            return redirect("supplier_profile")
-    else:
-        form = SupplierProfileForm(instance=supplier_profile)
-
-    return render(request, "supplier/profile.html", {
-        "form": form,
-        "supplier_profile": supplier_profile,
-        "is_supplier": True
-    })
-
-
-@login_required
-def place_order(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
-    farmer_profile = get_object_or_404(FarmerProfile, user=request.user)
-    supplier = product.supplier
-
-    if request.method == 'POST':
-        quantity = int(request.POST.get('quantity', 0))
-        if quantity > 0 and quantity <= product.stock:
-            Order.objects.create(
-                product=product,
-                supplier=supplier,
-                farmer=farmer_profile,
-                quantity=quantity
-            )
-            # Optionally reduce stock immediately
-            product.stock -= quantity
-            product.save()
-            return redirect('farmer_dashboard')
-
-    return redirect('farmer_dashboard')
-
-@login_required
-def farmer_orders(request):
-    orders = Order.objects.filter(farmer=request.user)
-    return render(request, 'orders/farmer_orders.html', {'orders': orders})
-
-@login_required
-def supplier_orders(request):
-    if not request.user.groups.filter(name="Supplier").exists():
-        return redirect('login')
-
-    supplier = SupplierProfile.objects.get(user=request.user)
-    orders = Order.objects.filter(supplier=supplier).order_by('-created_at')
-
-    return render(request, 'supplier/orders.html', {
-        'orders': orders,
-        'is_supplier': True
-    })
 
 
 
-@login_required
-def update_order_status(request, order_id, status):
-    if not request.user.groups.filter(name="Supplier").exists():
-        return redirect('login')
+# @login_required
+# def farmer_orders(request):
+#     orders = Order.objects.filter(farmer=request.user)
+#     return render(request, 'orders/farmer_orders.html', {'orders': orders})
 
-    order = get_object_or_404(Order, id=order_id)
-    if order.supplier.user == request.user:
-        order.status = status
-        order.save()
-    return redirect('supplier_dashboard')
 
 @login_required
 def export_report_pdf(request):
@@ -385,3 +261,158 @@ def export_report_pdf(request):
     p.save()
 
     return response
+
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .models import SupplierProfile, Product, Order
+from .forms import SupplierProfileForm
+
+# ---------------- Supplier Dashboard ----------------
+@login_required
+def supplier_dashboard(request):
+    if not request.user.groups.filter(name="Supplier").exists():
+        return redirect("login")
+
+    supplier_profile, _ = SupplierProfile.objects.get_or_create(user=request.user)
+
+    products = Product.objects.filter(supplier=supplier_profile)
+    orders = Order.objects.filter(supplier=supplier_profile).order_by('-created_at')
+
+    total_products = products.count()
+    total_orders = orders.count()
+
+    return render(request, "supplier/supplier_dashboard.html", {
+        "products": products,
+        "orders": orders,
+        "supplier_profile": supplier_profile,
+        "total_products": total_products,
+        "total_orders": total_orders,
+    })
+
+
+# ---------------- Add Product ----------------
+@login_required
+def add_product(request):
+    if not request.user.groups.filter(name='Supplier').exists():
+        return redirect('login')
+
+    supplier = SupplierProfile.objects.get(user=request.user)
+
+    if request.method == 'POST':
+        Product.objects.create(
+            supplier=supplier,
+            name=request.POST['name'],
+            price=request.POST['price'],
+            stock=request.POST['stock']
+        )
+        messages.success(request, 'Product added successfully')
+        return redirect('supplier_dashboard')
+    return redirect('supplier_dashboard')
+
+
+# ---------------- Edit Product ----------------
+@login_required
+def edit_product(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+
+    if product.supplier.user != request.user:
+        return redirect("login")
+
+    if request.method == "POST":
+        product.name = request.POST['name']
+        product.price = request.POST['price']
+        product.stock = request.POST['stock']
+        product.save()
+        messages.success(request, 'Product updated successfully')
+    return redirect("supplier_dashboard")
+
+
+# ---------------- Delete Product ----------------
+@login_required
+def delete_product(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+
+    if product.supplier.user != request.user:
+        return redirect("login")
+
+    product.delete()
+    messages.success(request, 'Product deleted successfully')
+    return redirect("supplier_dashboard")
+
+
+# ---------------- Supplier Profile ----------------
+@login_required
+def supplier_profile(request):
+    if not request.user.groups.filter(name="Supplier").exists():
+        return redirect("login")
+
+    supplier_profile, _ = SupplierProfile.objects.get_or_create(
+        user=request.user,
+        defaults={'company_name': request.user.username}
+    )
+
+    if request.method == "POST":
+        form = SupplierProfileForm(request.POST, request.FILES, instance=supplier_profile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Profile updated successfully")
+            return redirect("supplier_dashboard")
+    else:
+        form = SupplierProfileForm(instance=supplier_profile)
+
+    return redirect("supplier_dashboard")
+
+
+# ---------------- Place Order (Farmer Side) ----------------
+@login_required
+def place_order(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    farmer_profile = get_object_or_404(FarmerProfile, user=request.user)
+    supplier = product.supplier
+
+    if request.method == 'POST':
+        quantity = int(request.POST.get('quantity', 0))
+        if quantity > 0 and quantity <= product.stock:
+            Order.objects.create(
+                product=product,
+                supplier=supplier,
+                farmer=farmer_profile,
+                quantity=quantity
+            )
+            product.stock -= quantity
+            product.save()
+            messages.success(request, f"Order for {product.name} placed successfully!")
+        else:
+            messages.error(request, "Invalid quantity")
+    return redirect('farmer_dashboard')
+
+
+# ---------------- Supplier Orders ----------------
+@login_required
+def supplier_orders(request):
+    if not request.user.groups.filter(name="Supplier").exists():
+        return redirect('login')
+
+    supplier = SupplierProfile.objects.get(user=request.user)
+    orders = Order.objects.filter(supplier=supplier).order_by('-created_at')
+
+    return render(request, 'supplier/orders.html', {
+        'orders': orders,
+        'is_supplier': True
+    })
+
+
+# ---------------- Update Order Status ----------------
+@login_required
+def update_order_status(request, order_id, status):
+    if not request.user.groups.filter(name="Supplier").exists():
+        return redirect('login')
+
+    order = get_object_or_404(Order, id=order_id)
+    if order.supplier.user == request.user:
+        order.status = status
+        order.save()
+        messages.success(request, f"Order status updated to {status}")
+    return redirect('supplier_dashboard')
