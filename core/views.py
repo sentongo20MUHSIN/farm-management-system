@@ -263,11 +263,6 @@ def export_report_pdf(request):
     return response
 
 
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from .models import SupplierProfile, Product, Order
-from .forms import SupplierProfileForm
 
 # ---------------- Supplier Dashboard ----------------
 @login_required
